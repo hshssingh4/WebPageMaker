@@ -79,7 +79,7 @@ public class WebPageMaker extends AppTemplate {
 	    }
 	};
     }
-    
+
     /**
      * This is where program execution begins. Since this is a JavaFX app it
      * will simply call launch, which gets JavaFX rolling, resulting in sending

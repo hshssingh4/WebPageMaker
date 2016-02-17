@@ -337,7 +337,15 @@ public class Workspace extends AppWorkspaceComponent {
 		    });
 		    row++;
 		}
+                // Enable the buttons for which this item is a legal parent.
+                enableLegalParents(selectedTag);
 	    }
+            else {
+                // Disable the buttons since no node is selected
+                for (Button button: tagButtons) {
+                    button.setDisable(true);
+                }
+            }
 
 	    // LOAD THE CSS
 	    DataManager dataManager = (DataManager) app.getDataComponent();
@@ -372,5 +380,18 @@ public class Workspace extends AppWorkspaceComponent {
 	    AppMessageDialogSingleton dialog = AppMessageDialogSingleton.getSingleton();
 	    dialog.show(props.getProperty(TEMP_PAGE_LOAD_ERROR_TITLE), props.getProperty(TEMP_PAGE_LOAD_ERROR_MESSAGE));
 	}
+    }
+    
+    public void enableLegalParents(HTMLTagPrototype selectedTag)
+    {
+        DataManager dataManager = (DataManager) app.getDataComponent();
+        for(Button button: tagButtons) {
+            String tagName = button.getText();
+            HTMLTagPrototype buttonTag = dataManager.getTag(tagName);
+            if(buttonTag.isLegalParent(selectedTag.getTagName()))
+                button.setDisable(false);
+            else
+                button.setDisable(true);
+        }          
     }
 }

@@ -21,11 +21,14 @@ import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
 import javafx.scene.control.TreeItem;
 import javafx.scene.control.TreeView;
+import javafx.scene.image.Image;
+import javafx.scene.image.ImageView;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.FlowPane;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.VBox;
+import javafx.scene.text.Font;
 import javafx.scene.web.WebEngine;
 import javafx.scene.web.WebView;
 import properties_manager.PropertiesManager;
@@ -33,6 +36,8 @@ import saf.ui.AppGUI;
 import wpm.data.HTMLTagPrototype;
 import saf.AppTemplate;
 import saf.components.AppWorkspaceComponent;
+import static saf.settings.AppStartupConstants.FILE_PROTOCOL;
+import static saf.settings.AppStartupConstants.PATH_IMAGES;
 import wpm.PropertyType;
 import static wpm.PropertyType.TEMP_PAGE_LOAD_ERROR_MESSAGE;
 import static wpm.PropertyType.TEMP_PAGE_LOAD_ERROR_TITLE;
@@ -159,7 +164,25 @@ public class Workspace extends AppWorkspaceComponent {
 	htmlTree.setRoot(htmlRoot);
 	dataManager.setHTMLRoot(htmlRoot);
 	dataManager.reset();
-
+        
+        // Add the new Remove Element Button
+        PropertiesManager props = PropertiesManager.getPropertiesManager();
+        Button removeElementButton = new Button();
+        // LOAD THE ICON FROM THE PROVIDED FILE
+        String imagePath = FILE_PROTOCOL + PATH_IMAGES + props.getProperty("REMOVE_ICON");
+        Image buttonImage = new Image(imagePath);
+        removeElementButton.setGraphic(new ImageView(buttonImage));
+	removeElementButton.setMaxWidth(BUTTON_TAG_WIDTH);
+	removeElementButton.setMinWidth(BUTTON_TAG_WIDTH);
+        removeElementButton.setPrefWidth(BUTTON_TAG_WIDTH);
+	tagToolbar.getChildren().add(removeElementButton);
+        // INIT REMOVE ELEMENT BUTTON'S EVENT HANDLER
+        removeElementButton.setOnAction(e -> 
+        {
+            TreeItem selectedItem = (TreeItem) htmlTree.getSelectionModel().getSelectedItem();
+            pageEditController.handleRemoveElementRequest(selectedItem);
+	});
+            
 	// AND NOW USE THE LOADED TAG TYPES TO ADD BUTTONS
 	for (HTMLTagPrototype tag : dataManager.getTags()) {
 	    // MAKE THE BUTTON
@@ -292,6 +315,10 @@ public class Workspace extends AppWorkspaceComponent {
 	for (Button b : tagButtons) {
 	    b.getStyleClass().add(CLASS_TAG_BUTTON);
 	}
+        
+        // Add the CSS for remove element button
+       ((Button) tagToolbar.getChildren().get(0)).getStyleClass().add(CLASS_TAG_BUTTON);
+        
 	leftPane.getStyleClass().add(CLASS_MAX_PANE);
 	treeScrollPane.getStyleClass().add(CLASS_MAX_PANE);
 	tagEditorLabel.getStyleClass().add(CLASS_HEADING_LABEL);
@@ -338,13 +365,15 @@ public class Workspace extends AppWorkspaceComponent {
 		    row++;
 		}
                 // Enable the buttons for which this item is a legal parent.
-                enableLegalParents(selectedTag);
+                enableLegalChildren(selectedTag);
 	    }
             else {
                 // Disable the buttons since no node is selected
                 for (Button button: tagButtons) {
                     button.setDisable(true);
                 }
+                // Also disable the remove element button
+                ((Button) tagToolbar.getChildren().get(0)).setDisable(true);
             }
 
 	    // LOAD THE CSS
@@ -382,16 +411,51 @@ public class Workspace extends AppWorkspaceComponent {
 	}
     }
     
-    public void enableLegalParents(HTMLTagPrototype selectedTag)
+    /**
+     * This function helps to build upon the principles of full proof design.
+     * Every time user selects a new node, this function is called and its job
+     * is to make sure that only those buttons (children) are enabled that
+     * have the argument as a legal parent.
+     * 
+     * @param selectedTag 
+     * the tag that is currently selected in the tree.
+     */
+    public void enableLegalChildren(HTMLTagPrototype selectedTag)
     {
         DataManager dataManager = (DataManager) app.getDataComponent();
         for(Button button: tagButtons) {
             String tagName = button.getText();
-            HTMLTagPrototype buttonTag = dataManager.getTag(tagName);
-            if(buttonTag.isLegalParent(selectedTag.getTagName()))
+            HTMLTagPrototype tagButton = dataManager.getTag(tagName);
+            if(tagButton.isLegalParent(selectedTag.getTagName()))
                 button.setDisable(false);
             else
                 button.setDisable(true);
-        }          
+        }
+        
+        // Enforce legal removal by enabling/disabling the remove button
+        if(isTagRemovable(selectedTag))
+            ((Button) tagToolbar.getChildren().get(0)).setDisable(false);
+        else
+           ((Button) tagToolbar.getChildren().get(0)).setDisable(true);
+    }
+    
+    /**
+     * This method checks whether the selectedTag can be removed or not.
+     * This is also another one of those features that helps maintain the 
+     * full proof design for this application.
+     * 
+     * @param selectedTag
+     * the tag that is currently selected in the tree being edited
+     * 
+     * @return 
+     * true if the selected tag is removable, false otherwise
+     */
+    public boolean isTagRemovable(HTMLTagPrototype selectedTag)
+    {
+        // Return true if the tag is below body, false otherwise
+        return (selectedTag.isLegalParent("body") ||
+                selectedTag.getTagName().equals("tr") ||
+                selectedTag.getTagName().equals("td") ||
+                selectedTag.getTagName().equals("li"));                
     }
 }

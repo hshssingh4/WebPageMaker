@@ -135,6 +135,35 @@ public class PageEditController {
 	    }
 	}
     }
+    
+    /**
+     * This function responds to when the user tries to remove an element from
+     * the tree being edited.
+     * 
+     * @param itemToRemove The element to remove from the tree.
+     */
+    public void handleRemoveElementRequest(TreeItem itemToRemove) 
+    {
+	if (enabled) {
+	    Workspace workspace = (Workspace) app.getWorkspaceComponent();
+
+	    // REMOVE THE SELECTED NODE
+	    itemToRemove.getParent().getChildren().remove(itemToRemove);
+
+	    // FORCE A RELOAD OF TAG EDITOR
+	    workspace.reloadWorkspace();
+
+	    try {
+		FileManager fileManager = (FileManager) app.getFileComponent();
+		fileManager.exportData(app.getDataComponent(), TEMP_PAGE);
+	    } catch (IOException ioe) {
+		// AN ERROR HAPPENED WRITING TO THE TEMP FILE, NOTIFY THE USER
+		PropertiesManager props = PropertiesManager.getPropertiesManager();
+		AppMessageDialogSingleton dialog = AppMessageDialogSingleton.getSingleton();
+		dialog.show(props.getProperty(ADD_ELEMENT_ERROR_TITLE), props.getProperty(ADD_ELEMENT_ERROR_MESSAGE));
+	    }
+	}
+    }
 
     /**
      * This function provides a response to when the user changes the CSS

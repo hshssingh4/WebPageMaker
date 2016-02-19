@@ -54,3 +54,11 @@
 .prompt_text_field {
     -fx-font-size: 13pt;
 }
+
+// CSS CLASS FOR BORDERED PANE THAT CONTAINS NEW, SAVE, EXIT BUTTONS
+.bordered_pane
+{
+    -fx-border-width: 1px;
+    -fx-border-color: black;
+    -fx-background-color: #b5b2ff;
+}

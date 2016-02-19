@@ -6,12 +6,15 @@ import javafx.scene.control.TreeView;
 import javafx.scene.web.WebEngine;
 import properties_manager.PropertiesManager;
 import saf.ui.AppMessageDialogSingleton;
+import saf.ui.AppYesNoCancelDialogSingleton;
 import static wpm.PropertyType.ADD_ELEMENT_ERROR_MESSAGE;
 import static wpm.PropertyType.ADD_ELEMENT_ERROR_TITLE;
 import static wpm.PropertyType.ATTRIBUTE_UPDATE_ERROR_MESSAGE;
 import static wpm.PropertyType.ATTRIBUTE_UPDATE_ERROR_TITLE;
 import static wpm.PropertyType.CSS_EXPORT_ERROR_MESSAGE;
 import static wpm.PropertyType.CSS_EXPORT_ERROR_TITLE;
+import static saf.settings.AppPropertyType.REMOVE_ELEMENT_TITLE;
+import static saf.settings.AppPropertyType.REMOVE_ELEMENT_MESSAGE;
 import wpm.WebPageMaker;
 import wpm.data.DataManager;
 import wpm.data.HTMLTagPrototype;
@@ -145,11 +148,21 @@ public class PageEditController {
     public void handleRemoveElementRequest(TreeItem itemToRemove) 
     {
 	if (enabled) {
+            PropertiesManager props = PropertiesManager.getPropertiesManager();
 	    Workspace workspace = (Workspace) app.getWorkspaceComponent();
 
-	    // REMOVE THE SELECTED NODE
-	    itemToRemove.getParent().getChildren().remove(itemToRemove);
+            // CONFIRM REMOVAL OF NODE WITH USER
+            AppYesNoCancelDialogSingleton yesNoDialog = AppYesNoCancelDialogSingleton.getSingleton();
+            yesNoDialog.show(props.getProperty(REMOVE_ELEMENT_TITLE), props.getProperty(REMOVE_ELEMENT_MESSAGE));
+        
+            // AND NOW GET THE USER'S SELECTION
+            String selection = yesNoDialog.getSelection();
 
+            // IF THE USER SAID YES, THEN REMOVE THE ELEMENT
+            if (selection.equals(AppYesNoCancelDialogSingleton.YES))
+                 itemToRemove.getParent().getChildren().remove(itemToRemove);
+ 
+            // OTHERWISE, NO NEED TO DO ANYTHING
 	    // FORCE A RELOAD OF TAG EDITOR
 	    workspace.reloadWorkspace();
 
@@ -158,7 +171,6 @@ public class PageEditController {
 		fileManager.exportData(app.getDataComponent(), TEMP_PAGE);
 	    } catch (IOException ioe) {
 		// AN ERROR HAPPENED WRITING TO THE TEMP FILE, NOTIFY THE USER
-		PropertiesManager props = PropertiesManager.getPropertiesManager();
 		AppMessageDialogSingleton dialog = AppMessageDialogSingleton.getSingleton();
 		dialog.show(props.getProperty(ADD_ELEMENT_ERROR_TITLE), props.getProperty(ADD_ELEMENT_ERROR_MESSAGE));
 	    }

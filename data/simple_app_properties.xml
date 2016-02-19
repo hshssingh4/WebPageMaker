@@ -42,6 +42,8 @@
         <property name="SAVE_COMPLETED_TITLE"		value="Saving Completed"></property>
         <property name="SAVE_UNSAVED_WORK_MESSAGE"	value="Would you like to save your unsaved work first?"></property>
         <property name="SAVE_UNSAVED_WORK_TITLE"	value="Save unsaved work?"></property>
+        <property name="REMOVE_ELEMENT_MESSAGE" 	value="Are you sure you want to remove this element?"></property>
+        <property name="REMOVE_ELEMENT_TITLE"   	value="Remove Element"></property>
 	
         <property name="NEW_CREATED_MESSAGE"		value="New Work Created but not yet Saved"></property>
         <property name="WORK_SAVED_MESSAGE"		value="The Work has been Saved"></property>

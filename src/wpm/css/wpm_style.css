@@ -55,7 +55,7 @@
     -fx-font-size: 13pt;
 }
 
-// CSS CLASS FOR BORDERED PANE THAT CONTAINS NEW, SAVE, EXIT BUTTONS
+// CSS CLASS FOR BORDERED PANE THAT CONTAINS FILE AND TAG TOOLBARS
 .bordered_pane
 {
     -fx-border-width: 1px;

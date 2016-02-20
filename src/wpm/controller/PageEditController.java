@@ -29,7 +29,7 @@ import wpm.gui.Workspace;
  * editing them.
  *
  * @author Richard McKenna
- * @author ?
+ * @author Harpreet Singh
  * @version 1.0
  */
 public class PageEditController {
@@ -165,7 +165,8 @@ public class PageEditController {
             // OTHERWISE, NO NEED TO DO ANYTHING
 	    // FORCE A RELOAD OF TAG EDITOR
 	    workspace.reloadWorkspace();
-
+            workspace.getHTMLEngine().reload();
+            
 	    try {
 		FileManager fileManager = (FileManager) app.getFileComponent();
 		fileManager.exportData(app.getDataComponent(), TEMP_PAGE);

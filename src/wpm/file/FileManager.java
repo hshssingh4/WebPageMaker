@@ -1,5 +1,6 @@
 package wpm.file;
 
+import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -61,6 +62,12 @@ public class FileManager implements AppFileComponent {
     public static final String TEMP_CSS_PATH = PATH_CSS + CSS_FILE;
     public static final String PATH_TEMP = "./temp/";
     public static final String TEMP_PAGE = PATH_TEMP + INDEX_FILE;
+    public static final String PATH_IMAGES = "./temp/images/";
+   
+    File indexTempFile = new File(TEMP_PAGE);
+    File cssTempDir = new File(PATH_CSS);
+    File cssTempFile = new File(TEMP_CSS_PATH);
+    File imagesTempDir = new File(PATH_IMAGES);
     
     /**
      * This method is for saving user work, which in the case of this
@@ -215,8 +222,21 @@ public class FileManager implements AppFileComponent {
      * out data to the file.
      */
     @Override
-    public void exportData(AppDataComponent data, String filePath) throws IOException {
-	System.out.println("THIS SHOULD EXPORT THE WEB PAGE TO THE temp DIRECTORY, INCLUDING THE CSS FILE");
+    public void exportData(AppDataComponent data, String filePath) throws IOException 
+    {
+        if (indexTempFile.exists())
+            writeToHtmlFile(data, filePath);
+        else
+            indexTempFile.createNewFile();
+        
+        if (!cssTempDir.exists() && !cssTempFile.exists())
+        {
+            cssTempDir.mkdir();
+            cssTempFile.createNewFile();
+        }
+        
+        if (!imagesTempDir.exists())
+            imagesTempDir.mkdir();
     }
     
     /**
@@ -295,5 +315,55 @@ public class FileManager implements AppFileComponent {
 	PrintWriter out = new PrintWriter(filePath);
 	out.print("");
 	out.close();
+    }
+    
+    public void writeToHtmlFile(AppDataComponent data, String filePath) throws IOException
+    {
+        PrintWriter out = new PrintWriter(filePath);
+	DataManager dataManager = (DataManager) data;
+        // First print <!doctype html> declaration
+        out.print(DEFAULT_DOCTYPE_DECLARATION); 
+        TreeItem htmlRoot = dataManager.getHTMLRoot();
+        // Call the recursive Pre Order Traversal method to write index.html
+        writeTagToFile(htmlRoot, out);
+        out.close();             
+    }
+    
+    public void writeTagToFile(TreeItem node, PrintWriter out)
+    {
+        HTMLTagPrototype currentTag = (HTMLTagPrototype) node.getValue();
+        ObservableList children = node.getChildren();
+        
+        // Print the tag to the file using HTML format.
+        printTag(currentTag, out);
+        
+        for (Object child: children)
+        {
+            writeTagToFile((TreeItem) child, out);
+        }
+        
+        // Write the closing tag if any.
+        if(currentTag.hasClosingTag())
+            out.println("</" + currentTag.getTagName() + ">");
+        
+    }
+    
+    public void printTag(HTMLTagPrototype tag, PrintWriter out)
+    {
+        if(tag.getTagName().equals("Text"))
+            out.println(tag.getAttribute("text"));
+        else
+        {
+             out.print("<" + tag.getTagName()); // Open the tag and print its name.
+            HashMap<String, String> attributes = tag.getAttributes();
+        
+            // Print out the attributes inside the tag if there are any.
+            if(attributes != null)
+                for(HashMap.Entry<String, String> entry: attributes.entrySet())
+                    if(!entry.getValue().isEmpty())
+                        out.print(" " + entry.getKey() + " = " + "\"" + entry.getValue() + "\"");
+        
+            out.println(">"); // Close the opening tag.
+        }
     }
 }

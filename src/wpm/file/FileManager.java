@@ -224,17 +224,17 @@ public class FileManager implements AppFileComponent {
     @Override
     public void exportData(AppDataComponent data, String filePath) throws IOException 
     {
+        // Make the index file if it doesn't exist, update otherwise.
         if (indexTempFile.exists())
             writeToHtmlFile(data, filePath);
         else
             indexTempFile.createNewFile();
         
-        if (!cssTempDir.exists() && !cssTempFile.exists())
-        {
+        // Make the other directories and files if they don't exist.
+        if (!cssTempDir.exists())
             cssTempDir.mkdir();
+        if (!cssTempFile.exists())
             cssTempFile.createNewFile();
-        }
-        
         if (!imagesTempDir.exists())
             imagesTempDir.mkdir();
     }
@@ -317,6 +317,17 @@ public class FileManager implements AppFileComponent {
 	out.close();
     }
     
+    /**
+     * This method sets up the print writer and calls the method that writes
+     * the HTML Tags recursively to a file.
+     * @param data The data management component.
+     * 
+     * @param filePath Path (including file name/extension) to where
+     * to write out the data.
+     * 
+     * @throws IOException Thrown should there be an error writing
+     * out data to the file.
+     */
     public void writeToHtmlFile(AppDataComponent data, String filePath) throws IOException
     {
         PrintWriter out = new PrintWriter(filePath);
@@ -329,6 +340,13 @@ public class FileManager implements AppFileComponent {
         out.close();             
     }
     
+    /**
+     * This method writes all the tag to the HTML file recursively.
+     * @param node
+     * the root (tag) of the tree that is currently being processed.
+     * @param out 
+     * the print writer that will write out the file.
+     */
     public void writeTagToFile(TreeItem node, PrintWriter out)
     {
         HTMLTagPrototype currentTag = (HTMLTagPrototype) node.getValue();
@@ -338,9 +356,7 @@ public class FileManager implements AppFileComponent {
         printTag(currentTag, out);
         
         for (Object child: children)
-        {
             writeTagToFile((TreeItem) child, out);
-        }
         
         // Write the closing tag if any.
         if(currentTag.hasClosingTag())
@@ -348,6 +364,14 @@ public class FileManager implements AppFileComponent {
         
     }
     
+    /**
+     * Helper method to print out the tag name and attributes to the
+     * HTML file.
+     * @param tag
+     * the tag that will be written to the file.
+     * @param out 
+     * the print writer to write the file.
+     */
     public void printTag(HTMLTagPrototype tag, PrintWriter out)
     {
         if(tag.getTagName().equals("Text"))

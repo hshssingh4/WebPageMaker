@@ -85,10 +85,12 @@ public class PageEditController {
 		// THEN FORCE THE CHANGES TO THE TEMP HTML PAGE
 		FileManager fileManager = (FileManager) app.getFileComponent();
 		fileManager.exportData(app.getDataComponent(), TEMP_PAGE);
-
+                
 		// AND FINALLY UPDATE THE WEB PAGE DISPLAY USING THE NEW VALUES
 		Workspace workspace = (Workspace) app.getWorkspaceComponent();
 		workspace.getHTMLEngine().reload();
+                // Mark the file as not saved.
+                app.getGUI().updateToolbarControls(false);
 	    } catch (IOException ioe) {
 		// AN ERROR HAPPENED WRITING TO THE TEMP FILE, NOTIFY THE USER
 		PropertiesManager props = PropertiesManager.getPropertiesManager();
@@ -126,6 +128,9 @@ public class PageEditController {
 
 	    // FORCE A RELOAD OF TAG EDITOR
 	    workspace.reloadWorkspace();
+            
+            // Mark the file as not saved.
+            app.getGUI().updateToolbarControls(false);
 
 	    try {
 		FileManager fileManager = (FileManager) app.getFileComponent();
@@ -167,6 +172,9 @@ public class PageEditController {
 	    workspace.reloadWorkspace();
             workspace.getHTMLEngine().reload();
             
+            // Mark the file as not saved.
+            app.getGUI().updateToolbarControls(false);
+            
 	    try {
 		FileManager fileManager = (FileManager) app.getFileComponent();
 		fileManager.exportData(app.getDataComponent(), TEMP_PAGE);
@@ -201,6 +209,8 @@ public class PageEditController {
 		Workspace workspace = (Workspace) app.getWorkspaceComponent();
 		WebEngine htmlEngine = workspace.getHTMLEngine();
 		htmlEngine.reload();
+                // Mark the file as not saved.
+                app.getGUI().updateToolbarControls(false);
 	    } catch (IOException ioe) {
 		AppMessageDialogSingleton dialog = AppMessageDialogSingleton.getSingleton();
 		PropertiesManager props = PropertiesManager.getPropertiesManager();

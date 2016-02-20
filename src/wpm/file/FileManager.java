@@ -224,17 +224,22 @@ public class FileManager implements AppFileComponent {
     @Override
     public void exportData(AppDataComponent data, String filePath) throws IOException 
     {
-        // Make the index file if it doesn't exist, update otherwise.
+        DataManager dataManager = (DataManager) data;
+        // Update the temp file if it exists, make new otherwise.
         if (indexTempFile.exists())
-            writeToHtmlFile(data, filePath);
+            writeToHtmlFile(dataManager, filePath);
         else
             indexTempFile.createNewFile();
         
-        // Make the other directories and files if they don't exist.
+        // Update the css file if it exists, make new directory and file otherwise.
         if (!cssTempDir.exists())
             cssTempDir.mkdir();
-        if (!cssTempFile.exists())
+
+        if (cssTempFile.exists())
+            exportCSS(dataManager.getCSSText(), TEMP_CSS_PATH);
+        else
             cssTempFile.createNewFile();
+        // Make the other directories and files if they don't exist.
         if (!imagesTempDir.exists())
             imagesTempDir.mkdir();
     }
@@ -328,10 +333,9 @@ public class FileManager implements AppFileComponent {
      * @throws IOException Thrown should there be an error writing
      * out data to the file.
      */
-    public void writeToHtmlFile(AppDataComponent data, String filePath) throws IOException
+    public void writeToHtmlFile(DataManager dataManager, String filePath) throws IOException
     {
         PrintWriter out = new PrintWriter(filePath);
-	DataManager dataManager = (DataManager) data;
         // First print <!doctype html> declaration
         out.print(DEFAULT_DOCTYPE_DECLARATION); 
         TreeItem htmlRoot = dataManager.getHTMLRoot();

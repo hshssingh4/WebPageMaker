@@ -48,6 +48,7 @@ import wpm.controller.PageEditController;
 import wpm.data.DataManager;
 import static wpm.data.HTMLTagPrototype.TAG_HTML;
 import wpm.file.FileManager;
+import static wpm.file.FileManager.TEMP_CSS_PATH;
 import static wpm.file.FileManager.TEMP_PAGE;
 
 /**
@@ -383,6 +384,9 @@ public class Workspace extends AppWorkspaceComponent {
 	    // THEN FORCE THE CHANGES TO THE TEMP HTML PAGE
 	    FileManager fileManager = (FileManager) app.getFileComponent();
 	    fileManager.exportData(dataManager, TEMP_PAGE);
+            
+            // Then reload the web engine.
+            htmlEngine.reload();
 
 	    // WE DON'T WANT TO RESPOND TO EVENTS FORCED BY
 	    // OUR INITIALIZATION SELECTIONS

@@ -48,7 +48,6 @@ import wpm.controller.PageEditController;
 import wpm.data.DataManager;
 import static wpm.data.HTMLTagPrototype.TAG_HTML;
 import wpm.file.FileManager;
-import static wpm.file.FileManager.TEMP_CSS_PATH;
 import static wpm.file.FileManager.TEMP_PAGE;
 
 /**

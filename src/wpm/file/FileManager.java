@@ -338,12 +338,12 @@ public class FileManager implements AppFileComponent {
         out.print(DEFAULT_DOCTYPE_DECLARATION); 
         TreeItem htmlRoot = dataManager.getHTMLRoot();
         // Call the recursive Pre Order Traversal method to write index.html
-        writeTagToFile(htmlRoot, out, 0);
+        writeTagsToFile(htmlRoot, out, 0);
         out.close();             
     }
     
     /**
-     * This method writes all the tag to the HTML file recursively. It also
+     * This method writes all the tags to the HTML file recursively. It also
      * adds the proper indentation as one would in an HTML file.
      * @param node
      * the root (tag) of the tree that is currently being processed.
@@ -351,8 +351,10 @@ public class FileManager implements AppFileComponent {
      * the print writer that will write out the file.
      * @param depth
      * the depth of the current node in tree that specifies its indentation.
+     * @throws java.io.IOException
+     * indicates that there was error writing current tag to the file.
      */
-    public void writeTagToFile(TreeItem node, PrintWriter out, int depth)
+    public void writeTagsToFile(TreeItem node, PrintWriter out, int depth) throws IOException
     {
         HTMLTagPrototype currentTag = (HTMLTagPrototype) node.getValue();
         ObservableList children = node.getChildren();
@@ -365,7 +367,7 @@ public class FileManager implements AppFileComponent {
         printTag(currentTag, out);
         
         for (Object child: children)
-            writeTagToFile((TreeItem) child, out, depth + 1);
+            writeTagsToFile((TreeItem) child, out, depth + 1);
         
         // Write the closing tag if any along with indentation.
         if(currentTag.hasClosingTag())
@@ -375,7 +377,6 @@ public class FileManager implements AppFileComponent {
                 out.print("    ");
             out.println("</" + currentTag.getTagName() + ">");
         }
-        
     }
     
     /**
@@ -385,8 +386,10 @@ public class FileManager implements AppFileComponent {
      * the tag that will be written to the file.
      * @param out 
      * the print writer to write the file.
+     * @throws java.io.IOException
+     * indicates that there was an error writing tag to the file.
      */
-    public void printTag(HTMLTagPrototype tag, PrintWriter out)
+    public void printTag(HTMLTagPrototype tag, PrintWriter out) throws IOException
     {
         if(tag.getTagName().equals("Text"))
             out.println(tag.getAttribute("text"));

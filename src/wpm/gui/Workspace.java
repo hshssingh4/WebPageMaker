@@ -456,6 +456,9 @@ public class Workspace extends AppWorkspaceComponent {
     public boolean isTagRemovable(HTMLTagPrototype selectedTag)
     {
         // Return true if the tag is below body, false otherwise
+        /* tr, td, and li tags added as they don't explicity contain body 
+           as parent but are removable.
+        */
         return (selectedTag.isLegalParent("body") ||
                 selectedTag.getTagName().equals("tr") ||
                 selectedTag.getTagName().equals("td") ||

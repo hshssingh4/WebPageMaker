@@ -27,7 +27,6 @@ import saf.components.AppDataComponent;
 import saf.components.AppFileComponent;
 import wpm.data.DataManager;
 import wpm.data.HTMLTagPrototype;
-import static wpm.data.HTMLTagPrototype.TAG_TEXT;
 import static wpm.file.FileManager.JSON_TAG_NAME;
 
 /**
@@ -35,7 +34,7 @@ import static wpm.file.FileManager.JSON_TAG_NAME;
  * providing all I/O services.
  *
  * @author Richard McKenna
- * @author ?
+ * @author Harpreet Singh
  * @version 1.0
  */
 public class FileManager implements AppFileComponent {
@@ -325,13 +324,12 @@ public class FileManager implements AppFileComponent {
     /**
      * This method sets up the print writer and calls the method that writes
      * the HTML Tags recursively to a file.
-     * @param data The data management component.
-     * 
-     * @param filePath Path (including file name/extension) to where
-     * to write out the data.
-     * 
-     * @throws IOException Thrown should there be an error writing
-     * out data to the file.
+     * @param dataManager
+     * the manager that is currently managing the data for this file.
+     * @param filePath
+     * the path of the file to which these tags will be added to.
+     * @throws IOException 
+     * indicates that there was an error writing the file.
      */
     public void writeToHtmlFile(DataManager dataManager, String filePath) throws IOException
     {
@@ -340,31 +338,43 @@ public class FileManager implements AppFileComponent {
         out.print(DEFAULT_DOCTYPE_DECLARATION); 
         TreeItem htmlRoot = dataManager.getHTMLRoot();
         // Call the recursive Pre Order Traversal method to write index.html
-        writeTagToFile(htmlRoot, out);
+        writeTagToFile(htmlRoot, out, 0);
         out.close();             
     }
     
     /**
-     * This method writes all the tag to the HTML file recursively.
+     * This method writes all the tag to the HTML file recursively. It also
+     * adds the proper indentation as one would in an HTML file.
      * @param node
      * the root (tag) of the tree that is currently being processed.
      * @param out 
      * the print writer that will write out the file.
+     * @param depth
+     * the depth of the current node in tree that specifies its indentation.
      */
-    public void writeTagToFile(TreeItem node, PrintWriter out)
+    public void writeTagToFile(TreeItem node, PrintWriter out, int depth)
     {
         HTMLTagPrototype currentTag = (HTMLTagPrototype) node.getValue();
         ObservableList children = node.getChildren();
+        
+        // Print out the starting indentation based on the depth of the tag in the tree.
+        for (int i = 0; i < depth; i++)
+            out.print("    ");
         
         // Print the tag to the file using HTML format.
         printTag(currentTag, out);
         
         for (Object child: children)
-            writeTagToFile((TreeItem) child, out);
+            writeTagToFile((TreeItem) child, out, depth + 1);
         
-        // Write the closing tag if any.
+        // Write the closing tag if any along with indentation.
         if(currentTag.hasClosingTag())
+        {
+            // Print out the ending indentation based on the depth of the tag in the tree.
+            for (int i = 0; i < depth; i++)
+                out.print("    ");
             out.println("</" + currentTag.getTagName() + ">");
+        }
         
     }
     

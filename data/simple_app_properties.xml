@@ -5,6 +5,7 @@
     for the standard controls for an app from the SimpleAppFramework, so
     it would not include things initialized for the workspace, which is
     customizable.
+    @co-author: Harpreet Singh
 -->
 <properties>
     <property_list>
